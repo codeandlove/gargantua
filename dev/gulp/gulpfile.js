@@ -1,6 +1,5 @@
 // Include gulp
 var gulp = require('gulp');
-
 // Include Our Plugins
 var jshint = require('gulp-jshint');
 var sass = require('gulp-sass');
@@ -37,15 +36,29 @@ gulp.task('styles', function() {
         .pipe(browserSync.stream());
 });
 
-gulp.task('scripts', function() {
+gulp.task('libs', function() {
+  return gulp.src([
+      '../../src/js/lib/three.js',
+      '../../src/js/lib/**/*.js'
+    ])
+    .pipe(concat('libs.min.js'))
+    .pipe(uglify({
+        mangle: false
+    }))
+    .pipe(plumber())
+    .pipe(gulp.dest('../../src/js'))
+    .pipe(browserSync.stream())
+    .on('finish', browserSync.reload);
+});
+
+gulp.task('app', function() {
     gulp.src([
+            '../../src/js/src/lib/*.js',
             '../../src/js/src/app.js'
         ])
+        .pipe(concat('app.min.js'))
         .pipe(uglify({
             mangle: false
-        }))
-        .pipe(rename({
-            extname: '.min.js'
         }))
         .pipe(plumber())
         .pipe(gulp.dest('../../src/js'))
@@ -66,7 +79,8 @@ gulp.task('browser-sync', function() {
 // Watch Files For Changes
 gulp.task('watch', function() {
     gulp.watch('../../src/scss/**/*.scss', ['styles']);
-    gulp.watch(['../../src/js/src/app.js'], ['scripts']).on('finish', browserSync.reload);
+    gulp.watch(['../../src/js/lib/**/*.js'], ['libs']).on('finish', browserSync.reload);
+    gulp.watch(['../../src/js/src/**/*.js'], ['app']).on('finish', browserSync.reload);
 });
 
-gulp.task('default', [ 'styles', 'scripts', 'browser-sync', 'watch']);
+gulp.task('default', [ 'styles', 'libs', 'app', 'browser-sync', 'watch']);

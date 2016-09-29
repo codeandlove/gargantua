@@ -81,69 +81,9 @@ initWaves();
 
 scene.add(gargantua);
 
-// create the particle variables
-var particleCount = 1800;
-var particles = new THREE.Geometry();
-// create the particle variables
-var particleMaterial = new THREE.PointsMaterial(
-{color: 0xffffff,
-  size: 1,
-  map: new THREE.TextureLoader().load("./js/textures/particle.png"),
-  blending: THREE.AdditiveBlending,
-  transparent: true,
-  depthWrite: true,
-  depthTest: true,
-  opacity: Math.random() + 0.5
-});
+var particles_yellow = new THREE.EnvironmentParticles(1000, "./js/textures/particle_yellow.png");
 
-// now create the individual particles
-for (var p = 0; p < particleCount; p++) {
-
-  // create a particle with random
-  // position values, -250 -> 250
-  var pX = Math.random() * 500 - 250,
-      pY = Math.random() * 500 - 250,
-      pZ = Math.random() * 500 - 250,
-      particle = new THREE.Vector3(pX, pY, pZ);
-
-  // add it to the geometry
-  particles.vertices.push(particle);
-}
-
-// create the particle system
-var particleSystem = new THREE.Points(particles, particleMaterial);
-// add it to the scene
-scene.add(particleSystem);
-
-// also update the particle system to
-// sort the particles which enables
-// the behaviour we want
-particleSystem.sortParticles = true;
-
-
-
-function animateParticles() {
-
-  var verts = particleSystem.geometry.vertices;
-
-  var deltaTime = Date.now() * 0.0005;
-
-  var rnd = Math.random() * 0.025;
-
-  for(var i = 0; i < verts.length; i++) {
-
-      var vert = verts[i];
-
-      vert.x += Math.sin( deltaTime * 0.2 ) * rnd;
-      vert.y += Math.cos( deltaTime * 0.4 ) * rnd;
-      vert.z += Math.cos( deltaTime * 0.6 ) * rnd;
-
-  }
-
-  particleSystem.geometry.verticesNeedUpdate = true;
-
-};
-
+var particles_red = new THREE.EnvironmentParticles(1000, "./js/textures/particle_red.png");
 
 camera.position.z = 7;
 
@@ -173,7 +113,8 @@ var render = function () {
   light4.position.y = Math.cos( time * 0.7 ) * 40;
   light4.position.z = Math.sin( time * 0.5 ) * 30;
 
-  animateParticles();
+  particles_yellow.update();
+  particles_red.update();
 
   renderer.render(scene, camera);
 };
@@ -181,7 +122,7 @@ var render = function () {
 render();
 
 window.addEventListener('resize', function() {
-	camera.aspect = window.innerWidth / window.innerHeight;
-	camera.updateProjectionMatrix();
-	renderer.setSize( window.innerWidth, window.innerHeight );
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize( window.innerWidth, window.innerHeight );
 }, false);
